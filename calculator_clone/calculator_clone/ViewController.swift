@@ -24,7 +24,7 @@ class ViewController: UIViewController {
         if valueDisplay.text == "0"{
             valueDisplay.text = buttonText
             prevValue += buttonText!
-        }else if prevValue.count <= 8{
+        }else if getIntDigit() <= 8{
             prevValue += buttonText!
             setComma()
             valueDisplay.text = commaValue
@@ -41,6 +41,13 @@ class ViewController: UIViewController {
         labelTextSize = 90
         valueDisplay.font = valueDisplay.font.withSize(labelTextSize)
         valueDisplay.text = "0"
+    }
+    @IBAction func setDot(_ sender: UIButton) {
+        if getIntDigit() < 9  && commaValue.firstIndex(of:".") == nil{
+            prevValue += "."
+            commaValue += "."
+            valueDisplay.text = commaValue
+        }
     }
     
     func setComma(){
@@ -70,6 +77,11 @@ class ViewController: UIViewController {
         default:
             break
         }
+    }
+    
+    func getIntDigit() -> Int{
+        return prevValue.firstIndex(of:".") == nil ? prevValue.count : prevValue.count - 1
+        
     }
 }
 
