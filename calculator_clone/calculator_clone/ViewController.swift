@@ -10,6 +10,8 @@ import UIKit
 class ViewController: UIViewController {
     
     @IBOutlet weak var valueDisplay: UILabel!
+    @IBOutlet weak var resetButton: UIButton!
+    
     var prevValue: String = "0"
     var commaValue: String = "0"
     var labelTextSize: CGFloat = 90
@@ -28,6 +30,7 @@ class ViewController: UIViewController {
             if !isPositive{ prevValue.insert("-", at: prevValue.startIndex)}
             setComma()
             valueDisplay.text = commaValue
+            resetButton.titleLabel?.text = "C"
         }
         else if prevValue.getIntDigit() <= 8{
             prevValue += buttonText!
@@ -46,6 +49,7 @@ class ViewController: UIViewController {
         labelTextSize = 90
         valueDisplay.font = valueDisplay.font.withSize(labelTextSize)
         valueDisplay.text = "0"
+        resetButton.titleLabel?.text = "AC"
     }
     
     @IBAction func setDot(_ sender: UIButton) {
@@ -95,7 +99,6 @@ class ViewController: UIViewController {
         default:
             break
         }
-        print(commaValue)
     }
     
     //자연스러운 크기 감소 반영 필요

@@ -299,6 +299,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="resetButton" destination="aoS-G3-ogS" id="LoA-iX-7nC"/>
                         <outlet property="valueDisplay" destination="crO-Nu-zwO" id="clj-er-ckq"/>
                     </connections>
                 </viewController>
