@@ -4,6 +4,7 @@
 //
 //  Created by sanghyo on 2022/05/27.
 //
+
 import UIKit
 
 final class CalculatorViewController: UIViewController {
@@ -17,18 +18,19 @@ final class CalculatorViewController: UIViewController {
     
     private var nowValue: String = "0"
     private var nowTemp: String = ""
-    private var prevValue: Float = 0.0
+    private var prevValue: Double = 0.0
     private var commaValue: String = "0"
     private var labelTextSize: CGFloat = 90
     private var isPositive: Bool = true
     private var onTapping: Bool = false // 숫자 1자리 이상 입력했는지
     private var operationSymbol: OperationSymbol?
     private var rightBeforeSymbol: OperationSymbol?
+    private var clickedButton: UIButton?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        }
+    }
     
     //코드 지저분함 개선 필요(toggleSign에서부터 지저분해짐)
     @IBAction func tapNumber(_ sender: UIButton) {
@@ -37,12 +39,12 @@ final class CalculatorViewController: UIViewController {
         if rightBeforeSymbol != nil && rightBeforeSymbol != .percent && !onTapping{
             makeNowValueZero()
         }
-        if !onTapping{
+        if nowValue == "0" || nowValue == "-0"{
             nowValue = buttonText!
             if !isPositive{ nowValue.insert("-", at: nowValue.startIndex)}
             setComma(nowValue)
             valueDisplay.text = commaValue
-            resetButton.titleLabel?.text = "C"
+            if commaValue != "0" {resetButton.titleLabel?.text = "C"}
             onTapping.toggle()
         }
         else if nowValue.getIntDigit() <= 8{
@@ -67,25 +69,35 @@ final class CalculatorViewController: UIViewController {
     }
     
     @IBAction func setDot(_ sender: UIButton) {
-        //사칙연산 부호 이후 . 눌렀을 대 0.으로 뜨는 처리
-        if nowValue.getIntDigit() < 9  && nowValue.firstIndex(of:".") == nil{
+        //사칙연산 부호 이후 . 눌렀을 때 0.으로 뜨는 처리
+        if rightBeforeSymbol != nil && !onTapping{
+            nowValue = "0."
+            setComma(nowValue)
+            valueDisplay.text = commaValue
+            onTapping = true
+        }
+        else if nowValue.getIntDigit() < 9  && nowValue.firstIndex(of:".") == nil{
             nowValue += "."
             setComma(nowValue)
             valueDisplay.text = commaValue
         }
+        resizeLabelText()
+        valueDisplay.font = valueDisplay.font.withSize(labelTextSize)
     }
     
     @IBAction func toggleSign(_ sender: UIButton) {
         let firstIndex = nowValue.startIndex
-
+        
         if isPositive{
             isPositive = false
-            labelTextSize = nowValue.getIntDigit() >= 6 ? labelTextSize - 12 : labelTextSize
+            //labelTextSize = nowValue.getIntDigit() >= 6 ? labelTextSize - 12 : labelTextSize
             nowValue.insert("-", at: firstIndex)
+            resizeLabelText()
         }else{
             isPositive = true
             nowValue.remove(at: firstIndex)
-            labelTextSize = nowValue.getIntDigit() >= 6 ? labelTextSize + 12 : labelTextSize
+            //labelTextSize = nowValue.getIntDigit() >= 6 ? labelTextSize + 12 : labelTextSize
+            resizeLabelText()
         }
         setComma(nowValue)
         valueDisplay.text = commaValue
@@ -93,7 +105,7 @@ final class CalculatorViewController: UIViewController {
     }
     
     @IBAction func setOperationSymbol(_ sender: UIButton) {
-        prevValue = Float(nowValue)!
+        prevValue = Double(nowValue)!
         switch sender{
         case divideButton:
             operationSymbol = .divide
@@ -111,18 +123,24 @@ final class CalculatorViewController: UIViewController {
             break
         }
         onTapping = false
+            
     }
     
     @IBAction func percentFunction(_ sender: UIButton) {
-        nowValue = nowValue != "0" ? String(Float(nowValue)! / 100) : nowValue
+        nowValue = nowValue != "0" ? String(Double(nowValue)! / 100) : nowValue
         setComma(nowValue)
         valueDisplay.text = commaValue
+        resizeLabelText()
+        valueDisplay.font = valueDisplay.font.withSize(labelTextSize)
+        onTapping = false
+        operationSymbol = .percent
+        rightBeforeSymbol = .percent
     }
     
     @IBAction func equalFunction(_ sender: UIButton){
         if rightBeforeSymbol == .equal{
             //prevValue에 지금 입력한 값 혹은 임시 저장되어 있던 결과 값 대입, nowValue에 이전에 입력했던 뒤에 값 대입
-            prevValue = Float(nowValue)!
+            prevValue = Double(nowValue)!
             nowValue = nowTemp
         }
         if operationSymbol != nil && operationSymbol != OperationSymbol.percent{
@@ -134,35 +152,36 @@ final class CalculatorViewController: UIViewController {
             case .minus:
                 calculateMinus()
             case .plus:
-                print("plus")
                 calculatePlus()
             default:
                 break
             }
             setComma(String(prevValue))
-            valueDisplay.text = commaValue
+            valueDisplay.text = commaValue == "inf" ? "오류" : commaValue
             nowTemp = nowValue // 뒤에 값을 임시 저장
             nowValue = String(prevValue) //결과값을 nowValue에 임시 저장
+            resizeLabelText()
+            valueDisplay.font = valueDisplay.font.withSize(labelTextSize)
             rightBeforeSymbol = .equal
             onTapping = false
+            clickedButton = nil
         }
     }
     
     func calculateDivide(){
-        prevValue /= Float(nowValue)!
+        prevValue /= Double(nowValue)!
     }
     
     func calculateMultiply(){
-        prevValue *= Float(nowValue)!
+        prevValue *= Double(nowValue)!
     }
     
     func calculateMinus(){
-        prevValue -= Float(nowValue)!
+        prevValue -= Double(nowValue)!
     }
     
     func calculatePlus(){
-        print(prevValue, nowValue)
-        prevValue += Float(nowValue)!
+        prevValue += Double(nowValue)!
     }
     
     func makeNowValueZero(){
@@ -171,7 +190,7 @@ final class CalculatorViewController: UIViewController {
         isPositive = true
         labelTextSize = 90
         valueDisplay.font = valueDisplay.font.withSize(labelTextSize)
-            }
+    }
     
     //minus, comma, dot을 숫자로 인지하지 않도록 하는 코드가 다소 복잡해보임, 간결화 필요
     func setComma(_ beforeSetComma: String){
@@ -201,17 +220,19 @@ final class CalculatorViewController: UIViewController {
         }
     }
     
-    //자연스러운 크기 감소 반영 필요, -부호 있을 때 7번째 자리수부터 ...발생, 사이즈 조절 필요
     func resizeLabelText(){
-        switch nowValue.getIntDigit(){
+        let count = nowValue.firstIndex(of:"-") != nil ? nowValue.getIntDigit() + 1 : nowValue.getIntDigit()
+        switch count{
+        case 6:
+            labelTextSize = 90
         case 7:
-            labelTextSize -= 13
+            labelTextSize = 77
         case 8:
-            labelTextSize -= 10
+            labelTextSize = 70
         case 9:
-            labelTextSize -= 7
+            labelTextSize = 63
         case 10:
-            labelTextSize -= 7
+            labelTextSize = 56
         default:
             break
         }
@@ -236,3 +257,5 @@ enum OperationSymbol{
     case percent
     case equal
 }
+
+
