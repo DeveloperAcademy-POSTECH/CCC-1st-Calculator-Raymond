@@ -178,20 +178,23 @@ final class CalculatorViewController: UIViewController {
     func setComma(_ beforeSetComma: String){
         commaValue = beforeSetComma
         var intCount = commaValue.getIntDigit()
-        var lastIndex = commaValue.endIndex
+        var lastCountIndex = commaValue.endIndex
         
         if let tmpIndex = commaValue.firstIndex(of:"."){
-            lastIndex = tmpIndex
-            intCount = String(commaValue[commaValue.startIndex..<lastIndex]).getIntDigit()
-            commaValue = String(commaValue[commaValue.startIndex..<lastIndex])
+            lastCountIndex = tmpIndex
+            intCount = String(commaValue[commaValue.startIndex..<lastCountIndex]).getIntDigit()
+            let strLastIndex = commaValue.index(commaValue.endIndex, offsetBy: -1)
+            if tmpIndex == commaValue.index(before: strLastIndex) && commaValue[strLastIndex] == "0"{
+                commaValue = String(commaValue[commaValue.startIndex..<lastCountIndex])
+            }
         }
         switch intCount{
         case 4...6:
-            let firstComma = commaValue.index(lastIndex, offsetBy: -3)
+            let firstComma = commaValue.index(lastCountIndex, offsetBy: -3)
             commaValue.insert(",", at: firstComma)
         case 7...9:
-            let firstComma = commaValue.index(lastIndex, offsetBy: -3)
-            let secondComma = commaValue.index(lastIndex, offsetBy: -6)
+            let firstComma = commaValue.index(lastCountIndex, offsetBy: -3)
+            let secondComma = commaValue.index(lastCountIndex, offsetBy: -6)
             commaValue.insert(",", at: firstComma)
             commaValue.insert(",", at: secondComma)
         default:
