@@ -4,7 +4,6 @@
 //
 //  Created by sanghyo on 2022/05/27.
 //
-
 import UIKit
 
 final class CalculatorViewController: UIViewController {
@@ -237,4 +236,3 @@ enum OperationSymbol{
     case percent
     case equal
 }
-
