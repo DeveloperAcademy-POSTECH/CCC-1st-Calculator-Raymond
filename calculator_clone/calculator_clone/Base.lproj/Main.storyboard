@@ -8,10 +8,10 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--Calculator View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="calculator_clone" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="BYZ-38-t0r" customClass="CalculatorViewController" customModule="calculator_clone" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="390" height="844"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -81,6 +81,9 @@
                                                                 <buttonConfiguration key="configuration" style="plain" image="percent" catalog="system">
                                                                     <color key="baseForegroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 </buttonConfiguration>
+                                                                <connections>
+                                                                    <action selector="percentFunction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="vh4-xE-gYm"/>
+                                                                </connections>
                                                             </button>
                                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9sf-xk-Yom">
                                                                 <rect key="frame" x="293.33333333333331" y="0.0" width="96.666666666666686" height="100.33333333333333"/>
@@ -90,6 +93,9 @@
                                                                 <buttonConfiguration key="configuration" style="plain" image="divide" catalog="system">
                                                                     <color key="baseForegroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 </buttonConfiguration>
+                                                                <connections>
+                                                                    <action selector="setOperationSymbol:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Ccj-KO-vcJ"/>
+                                                                </connections>
                                                             </button>
                                                         </subviews>
                                                     </stackView>
@@ -137,6 +143,9 @@
                                                                 <buttonConfiguration key="configuration" style="plain" image="multiply" catalog="system">
                                                                     <color key="baseForegroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 </buttonConfiguration>
+                                                                <connections>
+                                                                    <action selector="setOperationSymbol:" destination="BYZ-38-t0r" eventType="touchUpInside" id="hPO-x6-rIH"/>
+                                                                </connections>
                                                             </button>
                                                         </subviews>
                                                     </stackView>
@@ -183,6 +192,9 @@
                                                                 <buttonConfiguration key="configuration" style="plain" image="minus" catalog="system">
                                                                     <color key="baseForegroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 </buttonConfiguration>
+                                                                <connections>
+                                                                    <action selector="setOperationSymbol:" destination="BYZ-38-t0r" eventType="touchUpInside" id="mog-ah-45v"/>
+                                                                </connections>
                                                             </button>
                                                         </subviews>
                                                     </stackView>
@@ -229,6 +241,9 @@
                                                                 <buttonConfiguration key="configuration" style="plain" image="plus" catalog="system">
                                                                     <color key="baseForegroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 </buttonConfiguration>
+                                                                <connections>
+                                                                    <action selector="setOperationSymbol:" destination="BYZ-38-t0r" eventType="touchUpInside" id="hJ3-la-JWg"/>
+                                                                </connections>
                                                             </button>
                                                         </subviews>
                                                     </stackView>
@@ -264,6 +279,9 @@
                                                                 <buttonConfiguration key="configuration" style="plain" image="equal" catalog="system">
                                                                     <color key="baseForegroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 </buttonConfiguration>
+                                                                <connections>
+                                                                    <action selector="equalFunction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="GUu-zf-5cF"/>
+                                                                </connections>
                                                             </button>
                                                         </subviews>
                                                         <constraints>
@@ -299,6 +317,10 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="divideButton" destination="9sf-xk-Yom" id="h4n-yo-1ep"/>
+                        <outlet property="minusButton" destination="V3o-O8-kaQ" id="Fkh-70-eXX"/>
+                        <outlet property="multiplyButton" destination="Fnp-xG-gvn" id="C1j-my-4Lk"/>
+                        <outlet property="plusButton" destination="RuG-bb-8DN" id="RDH-2m-zEL"/>
                         <outlet property="resetButton" destination="aoS-G3-ogS" id="LoA-iX-7nC"/>
                         <outlet property="valueDisplay" destination="crO-Nu-zwO" id="clj-er-ckq"/>
                     </connections>

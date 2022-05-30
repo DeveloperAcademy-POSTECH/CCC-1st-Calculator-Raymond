@@ -7,15 +7,22 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class CalculatorViewController: UIViewController {
     
     @IBOutlet weak var valueDisplay: UILabel!
     @IBOutlet weak var resetButton: UIButton!
+    @IBOutlet weak var divideButton: UIButton!
+    @IBOutlet weak var multiplyButton: UIButton!
+    @IBOutlet weak var minusButton: UIButton!
+    @IBOutlet weak var plusButton: UIButton!
     
     var prevValue: String = "0"
+    var nextValue: String = ""
     var commaValue: String = "0"
     var labelTextSize: CGFloat = 90
     var isPositive: Bool = true
+    var operationSymbol: OperationSymbol?
+    var rightBeforeSymbpl: OperationSymbol?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,6 +32,7 @@ class ViewController: UIViewController {
     //코드 지저분함 개선 필요(toggleSign에서부터 지저분해짐)
     @IBAction func tapNumber(_ sender: UIButton) {
         let buttonText = sender.titleLabel?.text
+        //연산(=, +, - ..) 이후 입력하면 새로운 값 입력되도록
         if prevValue == "0" || prevValue == "-0"{
             prevValue = buttonText!
             if !isPositive{ prevValue.insert("-", at: prevValue.startIndex)}
@@ -38,7 +46,6 @@ class ViewController: UIViewController {
             valueDisplay.text = commaValue
             resizeLabelText()
             valueDisplay.font = valueDisplay.font.withSize(labelTextSize)
-
         }
     }
     
@@ -53,16 +60,17 @@ class ViewController: UIViewController {
     }
     
     @IBAction func setDot(_ sender: UIButton) {
-        if prevValue.getIntDigit() < 9  && commaValue.firstIndex(of:".") == nil{
+        //사칙연산 부호 이후 . 눌렀을 대 0.으로 뜨는 처리
+        if prevValue.getIntDigit() < 9  && prevValue.firstIndex(of:".") == nil{
             prevValue += "."
-            commaValue += "."
+            setComma()
             valueDisplay.text = commaValue
         }
     }
     
     @IBAction func toggleSign(_ sender: UIButton) {
         let firstIndex = prevValue.startIndex
-    
+
         if isPositive{
             isPositive = false
             labelTextSize = prevValue.getIntDigit() >= 6 ? labelTextSize - 12 : labelTextSize
@@ -75,6 +83,31 @@ class ViewController: UIViewController {
         setComma()
         valueDisplay.text = commaValue
         valueDisplay.font = valueDisplay.font.withSize(labelTextSize)
+    }
+    
+    @IBAction func setOperationSymbol(_ sender: UIButton) {
+        switch sender{
+        case divideButton:
+            operationSymbol = OperationSymbol.divide
+        case multiplyButton:
+            operationSymbol = OperationSymbol.multiply
+        case minusButton:
+            operationSymbol = OperationSymbol.minus
+        case plusButton:
+            operationSymbol = OperationSymbol.plus
+        default:
+            break
+        }
+    }
+    
+    @IBAction func percentFunction(_ sender: UIButton) {
+        prevValue = prevValue != "0" ? String(Double(prevValue)! / 100) : prevValue
+        setComma()
+        valueDisplay.text = commaValue
+    }
+    
+    @IBAction func equalFunction(_ sender: UIButton) {
+        
     }
     
     //minus, comma, dot을 숫자로 인지하지 않도록 하는 코드가 다소 복잡해보임, 간결화 필요
@@ -110,9 +143,18 @@ class ViewController: UIViewController {
             labelTextSize -= 12
         case 9:
             labelTextSize -= 12
+        case 10:
+            labelTextSize -= 12
         default:
             break
         }
+    }
+    
+    func roundValue(_ targetValue: Double) -> String{
+        let digit: Double = pow(10, 8)
+        let res = round(targetValue * digit) / digit
+        
+        return String(res)
     }
 }
 
@@ -126,4 +168,12 @@ extension String{
     }
 }
 
+enum OperationSymbol{
+    case divide
+    case multiply
+    case minus
+    case plus
+    case percent
+    case equal
+}
 
