@@ -17,12 +17,14 @@ final class CalculatorViewController: UIViewController {
     @IBOutlet weak var plusButton: UIButton!
     
     private var nowValue: String = "0"
-    private var prevValue: Float = ""
+    private var nowTemp: String = ""
+    private var prevValue: Float = 0.0
     private var commaValue: String = "0"
     private var labelTextSize: CGFloat = 90
     private var isPositive: Bool = true
+    private var onTapping: Bool = false // 숫자 1자리 이상 입력했는지
     private var operationSymbol: OperationSymbol?
-    private var rightBeforeSymbpl: OperationSymbol?
+    private var rightBeforeSymbol: OperationSymbol?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,12 +35,16 @@ final class CalculatorViewController: UIViewController {
     @IBAction func tapNumber(_ sender: UIButton) {
         let buttonText = sender.titleLabel?.text
         //연산(=, +, - ..) 이후 입력하면 새로운 값 입력되도록
-        if nowValue == "0" || nowValue == "-0"{
+        if rightBeforeSymbol != nil && rightBeforeSymbol != .percent && !onTapping{
+            makeNowValueZero()
+        }
+        if !onTapping{
             nowValue = buttonText!
             if !isPositive{ nowValue.insert("-", at: nowValue.startIndex)}
             setComma(nowValue)
             valueDisplay.text = commaValue
             resetButton.titleLabel?.text = "C"
+            onTapping.toggle()
         }
         else if nowValue.getIntDigit() <= 8{
             nowValue += buttonText!
@@ -50,14 +56,15 @@ final class CalculatorViewController: UIViewController {
     }
     
     @IBAction func resetValue(_ sender: UIButton) {
-        print(sender.state)
         nowValue = "0"
+        prevValue = 0.0
         commaValue = "0"
         isPositive = true
         labelTextSize = 90
         valueDisplay.font = valueDisplay.font.withSize(labelTextSize)
         valueDisplay.text = "0"
         resetButton.titleLabel?.text = "AC"
+        onTapping = false
     }
     
     @IBAction func setDot(_ sender: UIButton) {
@@ -87,18 +94,24 @@ final class CalculatorViewController: UIViewController {
     }
     
     @IBAction func setOperationSymbol(_ sender: UIButton) {
+        prevValue = Float(nowValue)!
         switch sender{
         case divideButton:
-            operationSymbol = OperationSymbol.divide
+            operationSymbol = .divide
+            rightBeforeSymbol = .divide
         case multiplyButton:
-            operationSymbol = OperationSymbol.multiply
+            operationSymbol = .multiply
+            rightBeforeSymbol = .multiply
         case minusButton:
-            operationSymbol = OperationSymbol.minus
+            operationSymbol = .minus
+            rightBeforeSymbol = .minus
         case plusButton:
-            operationSymbol = OperationSymbol.plus
+            operationSymbol = .plus
+            rightBeforeSymbol = .plus
         default:
             break
         }
+        onTapping = false
     }
     
     @IBAction func percentFunction(_ sender: UIButton) {
@@ -107,8 +120,33 @@ final class CalculatorViewController: UIViewController {
         valueDisplay.text = commaValue
     }
     
-    @IBAction func equalFunction(_ sender: UIButton) {
-        
+    @IBAction func equalFunction(_ sender: UIButton){
+        if rightBeforeSymbol == .equal{
+            //prevValue에 지금 입력한 값 혹은 임시 저장되어 있던 결과 값 대입, nowValue에 이전에 입력했던 뒤에 값 대입
+            prevValue = Float(nowValue)!
+            nowValue = nowTemp
+        }
+        if operationSymbol != nil && operationSymbol != OperationSymbol.percent{
+            switch operationSymbol{
+            case .divide:
+                calculateDivide()
+            case .multiply:
+                calculateMultiply()
+            case .minus:
+                calculateMinus()
+            case .plus:
+                print("plus")
+                calculatePlus()
+            default:
+                break
+            }
+            setComma(String(prevValue))
+            valueDisplay.text = commaValue
+            nowTemp = nowValue // 뒤에 값을 임시 저장
+            nowValue = String(prevValue) //결과값을 nowValue에 임시 저장
+            rightBeforeSymbol = .equal
+            onTapping = false
+        }
     }
     
     func calculateDivide(){
@@ -124,8 +162,17 @@ final class CalculatorViewController: UIViewController {
     }
     
     func calculatePlus(){
+        print(prevValue, nowValue)
         prevValue += Float(nowValue)!
     }
+    
+    func makeNowValueZero(){
+        nowValue = "0"
+        commaValue = "0"
+        isPositive = true
+        labelTextSize = 90
+        valueDisplay.font = valueDisplay.font.withSize(labelTextSize)
+            }
     
     //minus, comma, dot을 숫자로 인지하지 않도록 하는 코드가 다소 복잡해보임, 간결화 필요
     func setComma(_ beforeSetComma: String){
@@ -136,6 +183,7 @@ final class CalculatorViewController: UIViewController {
         if let tmpIndex = commaValue.firstIndex(of:"."){
             lastIndex = tmpIndex
             intCount = String(commaValue[commaValue.startIndex..<lastIndex]).getIntDigit()
+            commaValue = String(commaValue[commaValue.startIndex..<lastIndex])
         }
         switch intCount{
         case 4...6:
