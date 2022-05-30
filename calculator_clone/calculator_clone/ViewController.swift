@@ -181,7 +181,6 @@ final class CalculatorViewController: UIViewController {
     }
     
     func calculatePlus(){
-        print(prevValue, nowValue)
         prevValue += Double(nowValue)!
     }
     
@@ -221,10 +220,8 @@ final class CalculatorViewController: UIViewController {
         }
     }
     
-    //자연스러운 크기 감소 반영 필요, -부호 있을 때 7번째 자리수부터 ...발생, 사이즈 조절 필요
     func resizeLabelText(){
         let count = nowValue.firstIndex(of:"-") != nil ? nowValue.getIntDigit() + 1 : nowValue.getIntDigit()
-        print(count)
         switch count{
         case 6:
             labelTextSize = 90
