@@ -25,6 +25,7 @@ final class CalculatorViewController: UIViewController {
     private var onTapping: Bool = false // 숫자 1자리 이상 입력했는지
     private var operationSymbol: OperationSymbol?
     private var rightBeforeSymbol: OperationSymbol?
+    private var clickedButton: UIButton?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,12 +39,12 @@ final class CalculatorViewController: UIViewController {
         if rightBeforeSymbol != nil && rightBeforeSymbol != .percent && !onTapping{
             makeNowValueZero()
         }
-        if !onTapping{
+        if nowValue == "0" || nowValue == "-0"{
             nowValue = buttonText!
             if !isPositive{ nowValue.insert("-", at: nowValue.startIndex)}
             setComma(nowValue)
             valueDisplay.text = commaValue
-            resetButton.titleLabel?.text = "C"
+            if commaValue != "0" {resetButton.titleLabel?.text = "C"}
             onTapping.toggle()
         }
         else if nowValue.getIntDigit() <= 8{
@@ -105,7 +106,6 @@ final class CalculatorViewController: UIViewController {
     
     @IBAction func setOperationSymbol(_ sender: UIButton) {
         prevValue = Double(nowValue)!
-        print(prevValue)
         switch sender{
         case divideButton:
             operationSymbol = .divide
@@ -123,6 +123,7 @@ final class CalculatorViewController: UIViewController {
             break
         }
         onTapping = false
+            
     }
     
     @IBAction func percentFunction(_ sender: UIButton) {
@@ -163,6 +164,7 @@ final class CalculatorViewController: UIViewController {
             valueDisplay.font = valueDisplay.font.withSize(labelTextSize)
             rightBeforeSymbol = .equal
             onTapping = false
+            clickedButton = nil
         }
     }
     
