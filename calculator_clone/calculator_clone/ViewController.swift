@@ -30,7 +30,7 @@ final class CalculatorViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-    }
+        }
     
     //코드 지저분함 개선 필요(toggleSign에서부터 지저분해짐)
     @IBAction func tapNumber(_ sender: UIButton) {
@@ -44,7 +44,7 @@ final class CalculatorViewController: UIViewController {
             if !isPositive{ nowValue.insert("-", at: nowValue.startIndex)}
             setComma(nowValue)
             valueDisplay.text = commaValue
-            if commaValue != "0" {resetButton.titleLabel?.text = "C"}
+            if commaValue != "0" && commaValue != "-0"{resetButton.titleLabel?.text = "C"}
             onTapping.toggle()
         }
         else if nowValue.getIntDigit() <= 8{
