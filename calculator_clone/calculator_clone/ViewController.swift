@@ -10,33 +10,39 @@ import UIKit
 class ViewController: UIViewController {
     
     @IBOutlet weak var valueDisplay: UILabel!
-    var prevValue: String = ""
-    var commaValue: String = ""
+    var prevValue: String = "0"
+    var commaValue: String = "0"
     var labelTextSize: CGFloat = 90
+    var isPositive: Bool = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
     }
     
+    //코드 지저분함 개선 필요(toggleSign에서부터 지저분해짐)
     @IBAction func tapNumber(_ sender: UIButton) {
         let buttonText = sender.titleLabel?.text
-        if valueDisplay.text == "0"{
-            valueDisplay.text = buttonText
-            prevValue += buttonText!
-        }else if prevValue.getIntDigit() <= 8{
-            prevValue += buttonText!
-            setComma(tappedInt: buttonText!)
+        if prevValue == "0" || prevValue == "-0"{
+            prevValue = buttonText!
+            if !isPositive{ prevValue.insert("-", at: prevValue.startIndex)}
+            setComma()
             valueDisplay.text = commaValue
-            resizeLabelText(prevValue.count)
-            valueDisplay.font = valueDisplay.font.withSize(labelTextSize)
         }
-        
+        else if prevValue.getIntDigit() <= 8{
+            prevValue += buttonText!
+            setComma()
+            valueDisplay.text = commaValue
+            resizeLabelText()
+            valueDisplay.font = valueDisplay.font.withSize(labelTextSize)
+
+        }
     }
     
     @IBAction func resetValue(_ sender: UIButton) {
-        prevValue = ""
-        commaValue = ""
+        prevValue = "0"
+        commaValue = "0"
+        isPositive = true
         labelTextSize = 90
         valueDisplay.font = valueDisplay.font.withSize(labelTextSize)
         valueDisplay.text = "0"
@@ -50,36 +56,57 @@ class ViewController: UIViewController {
         }
     }
     
-    func setComma(tappedInt: String){
-        if prevValue.firstIndex(of:".") == nil{
-            commaValue = prevValue
-            switch prevValue.getIntDigit(){
-            case 4...6:
-                let firstComma = commaValue.index(commaValue.endIndex, offsetBy: -3)
-                commaValue.insert(",", at: firstComma)
-            case 7...9:
-                let firstComma = commaValue.index(commaValue.endIndex, offsetBy: -3)
-                let secondComma = commaValue.index(commaValue.endIndex, offsetBy: -6)
-                commaValue.insert(",", at: firstComma)
-                commaValue.insert(",", at: secondComma)
-            default:
-                break
-            }
-
+    @IBAction func toggleSign(_ sender: UIButton) {
+        let firstIndex = prevValue.startIndex
+    
+        if isPositive{
+            isPositive = false
+            labelTextSize = prevValue.getIntDigit() >= 6 ? labelTextSize - 12 : labelTextSize
+            prevValue.insert("-", at: firstIndex)
         }else{
-            commaValue += tappedInt
+            isPositive = true
+            prevValue.remove(at: firstIndex)
+            labelTextSize = prevValue.getIntDigit() >= 6 ? labelTextSize + 12 : labelTextSize
         }
+        setComma()
+        valueDisplay.text = commaValue
+        valueDisplay.font = valueDisplay.font.withSize(labelTextSize)
     }
     
-    //dot 추가, - 추가와 숫자 개수에 따른 크기 감소 반영 필요
-    func resizeLabelText(_ intDigitLen: Int){
-        switch intDigitLen{
+    //minus, comma, dot을 숫자로 인지하지 않도록 하는 코드가 다소 복잡해보임, 간결화 필요
+    func setComma(){
+        commaValue = prevValue
+        var intCount = commaValue.getIntDigit()
+        var lastIndex = commaValue.endIndex
+        
+        if let tmpIndex = commaValue.firstIndex(of:"."){
+            lastIndex = tmpIndex
+            intCount = String(commaValue[commaValue.startIndex..<lastIndex]).getIntDigit()
+        }
+        switch intCount{
+        case 4...6:
+            let firstComma = commaValue.index(lastIndex, offsetBy: -3)
+            commaValue.insert(",", at: firstComma)
+        case 7...9:
+            let firstComma = commaValue.index(lastIndex, offsetBy: -3)
+            let secondComma = commaValue.index(lastIndex, offsetBy: -6)
+            commaValue.insert(",", at: firstComma)
+            commaValue.insert(",", at: secondComma)
+        default:
+            break
+        }
+        print(commaValue)
+    }
+    
+    //자연스러운 크기 감소 반영 필요
+    func resizeLabelText(){
+        switch prevValue.getIntDigit(){
         case 7:
-            labelTextSize -= 13
+            labelTextSize -= 12
         case 8:
-            labelTextSize -= 10
+            labelTextSize -= 12
         case 9:
-            labelTextSize -= 10
+            labelTextSize -= 12
         default:
             break
         }
@@ -88,7 +115,11 @@ class ViewController: UIViewController {
 
 extension String{
     func getIntDigit() -> Int{
-        return self.firstIndex(of:".") != nil ? self.count - 1 : self.count
+        var intDigitNum: Int = self.count
+        intDigitNum = self.firstIndex(of:".") != nil ? intDigitNum - 1 : intDigitNum
+        intDigitNum = self.firstIndex(of:"-") != nil ? intDigitNum - 1 : intDigitNum
+        
+        return intDigitNum
     }
 }
 
