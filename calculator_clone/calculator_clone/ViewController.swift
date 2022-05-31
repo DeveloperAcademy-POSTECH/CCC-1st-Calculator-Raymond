@@ -105,7 +105,32 @@ final class CalculatorViewController: UIViewController {
     }
     
     @IBAction func setOperationSymbol(_ sender: UIButton) {
-        prevValue = Double(nowValue)!
+        if rightBeforeSymbol == nil || rightBeforeSymbol == .percent || rightBeforeSymbol == .equal{
+            prevValue = Double(nowValue)!
+        }
+        else{
+            if operationSymbol != nil && operationSymbol != OperationSymbol.percent{
+                switch operationSymbol{
+                case .divide:
+                    calculateDivide()
+                case .multiply:
+                    calculateMultiply()
+                case .minus:
+                    calculateMinus()
+                case .plus:
+                    calculatePlus()
+                default:
+                    break
+                }
+                setComma(String(prevValue))
+                valueDisplay.text = commaValue == "inf" ? "오류" : commaValue
+                nowTemp = nowValue // 뒤에 값을 임시 저장
+                nowValue = String(prevValue) //결과값을 nowValue에 임시 저장
+                resizeLabelText()
+                valueDisplay.font = valueDisplay.font.withSize(labelTextSize)
+                clickedButton = nil
+            }
+        }
         switch sender{
         case divideButton:
             operationSymbol = .divide
@@ -123,7 +148,6 @@ final class CalculatorViewController: UIViewController {
             break
         }
         onTapping = false
-            
     }
     
     @IBAction func percentFunction(_ sender: UIButton) {
@@ -257,5 +281,3 @@ enum OperationSymbol{
     case percent
     case equal
 }
-
-
